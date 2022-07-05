@@ -50,6 +50,10 @@ export class OrcaPoolImpl implements OrcaPool {
       network === Network.MAINNET ? ORCA_TOKEN_SWAP_ID : ORCA_TOKEN_SWAP_ID_DEVNET;
   }
 
+  public getPoolParams(): OrcaPoolParams {
+    return this.poolParams;
+  }
+
   public getTokenA(): OrcaPoolToken {
     const tokenId = this.poolParams.tokenIds[0];
     return this.poolParams.tokens[tokenId];

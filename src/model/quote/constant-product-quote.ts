@@ -13,7 +13,7 @@ import { QuotePoolParams } from "./quote-builder";
  * k =  x * y
  */
 
-function getRate(inputTradeAmountU64: u64, params: QuotePoolParams): Decimal {
+export function getRate(inputTradeAmountU64: u64, params: QuotePoolParams): Decimal {
   if (inputTradeAmountU64.eq(ZERO)) {
     return new Decimal(0);
   }
@@ -24,7 +24,7 @@ function getRate(inputTradeAmountU64: u64, params: QuotePoolParams): Decimal {
   return outputTradeAmount.div(inputTradeAmount).toDecimalPlaces(params.outputToken.scale);
 }
 
-function getPriceImpact(inputTradeAmount: u64, params: QuotePoolParams): Decimal {
+export function getPriceImpact(inputTradeAmount: u64, params: QuotePoolParams): Decimal {
   if (inputTradeAmount.eq(ZERO) || params.outputTokenCount.eq(ZERO)) {
     return new Decimal(0);
   }
@@ -42,7 +42,7 @@ function getPriceImpact(inputTradeAmount: u64, params: QuotePoolParams): Decimal
   return impact.mul(100).toDecimalPlaces(params.outputToken.scale);
 }
 
-function getLPFees(inputTradeAmount: u64, params: QuotePoolParams): u64 {
+export function getLPFees(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   const { feeStructure } = params;
   const tradingFee = inputTradeAmount
     .mul(feeStructure.traderFee.numerator)
@@ -55,12 +55,12 @@ function getLPFees(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   return new u64(tradingFee.add(ownerFee).toString());
 }
 
-function getExpectedOutputAmount(inputTradeAmount: u64, params: QuotePoolParams): u64 {
+export function getExpectedOutputAmount(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   const inputTradeLessFees = inputTradeAmount.sub(getLPFees(inputTradeAmount, params));
   return getOutputAmount(inputTradeLessFees, params);
 }
 
-function getExpectedOutputAmountWithNoSlippage(
+export function getExpectedOutputAmountWithNoSlippage(
   inputTradeAmount: u64,
   params: QuotePoolParams
 ): u64 {
@@ -72,7 +72,7 @@ function getExpectedOutputAmountWithNoSlippage(
   return inputTradeLessFees.mul(params.outputTokenCount).div(params.inputTokenCount);
 }
 
-function getMinimumAmountOut(inputTradeAmount: u64, params: QuotePoolParams): u64 {
+export function getMinimumAmountOut(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   const slippageTolerance = params.slippageTolerance;
   const expectedOutputAmountFees = getExpectedOutputAmount(inputTradeAmount, params);
   const result = expectedOutputAmountFees
@@ -84,7 +84,7 @@ function getMinimumAmountOut(inputTradeAmount: u64, params: QuotePoolParams): u6
 // Note: This function matches the calculation done on SERUM and on Web UI.
 // Given k = currInputTokenCount * currOutputTokenCount and k = newInputTokenCount * newOutputTokenCount,
 // solve for newOutputTokenCount
-function getOutputAmount(inputTradeAmount: u64, params: QuotePoolParams): u64 {
+export function getOutputAmount(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   const [poolInputAmount, poolOutputAmount] = [params.inputTokenCount, params.outputTokenCount];
 
   const invariant = poolInputAmount.mul(poolOutputAmount);
@@ -99,7 +99,7 @@ function getOutputAmount(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   return new u64(outputAmount.toString());
 }
 
-function getNetworkFees(params: QuotePoolParams) {
+export function getNetworkFees(params: QuotePoolParams) {
   let numSigs;
   if (params.inputToken === solToken || params.outputToken === solToken) {
     numSigs = 3;

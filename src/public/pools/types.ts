@@ -3,6 +3,7 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 import Decimal from "decimal.js";
 import { OrcaU64 } from "..";
 import { TransactionPayload } from "../utils";
+import { OrcaPoolParams } from "../../model/orca/pool/pool-types";
 
 export type DepositQuote = {
   minPoolTokenAmountOut: OrcaU64; // MISNOMER - this value represents the exact poolTokenAmountOut
@@ -20,6 +21,7 @@ export type WithdrawQuote = {
  * Allows interactions with an Orca liquidity pool.
  */
 export type OrcaPool = {
+  getPoolParams: () => OrcaPoolParams;
   /**
    * Query the token of tokenA in this pool.
    * @returns Returns the token id of tokenA in this pool
