@@ -3,6 +3,7 @@ import Decimal from "decimal.js";
 import { solToken } from "../../constants/tokens";
 import { ZERO, DecimalUtil, U64Utils, OrcaU64, Quote } from "../../public";
 import { QuotePoolParams } from "./quote-builder";
+import { FeeStructure, CurveType } from "../orca/pool/pool-types";
 
 /**
  * ConstantProductPools
@@ -127,4 +128,22 @@ export class ConstantProductPoolQuoteBuilder {
         OrcaU64.fromU64(getMinimumAmountOut(inputTradeAmount, params), params.outputToken.scale),
     };
   }
+}
+
+export function calculateFees(inputTradeAmount: u64, feeStructure: FeeStructure): u64 {
+  const tradingFee =
+    feeStructure.traderFee.numerator === ZERO
+      ? ZERO
+      : inputTradeAmount
+          .mul(feeStructure.traderFee.numerator)
+          .div(feeStructure.traderFee.denominator);
+
+  const ownerFee =
+    feeStructure.ownerFee.numerator === ZERO
+      ? ZERO
+      : inputTradeAmount
+          .mul(feeStructure.ownerFee.numerator)
+          .div(feeStructure.ownerFee.denominator);
+
+  return new u64(tradingFee.add(ownerFee).toString());
 }

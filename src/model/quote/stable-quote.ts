@@ -4,6 +4,7 @@ import { computeBaseOutputAmount, computeOutputAmount } from "@orca-so/stablecur
 import { QuotePoolParams } from "./quote-builder";
 import { DecimalUtil, OrcaU64, Quote, ZERO } from "../../public";
 import { solToken } from "../../constants/tokens";
+import { FeeStructure, CurveType } from "../orca/pool/pool-types";
 
 function getInputAmountLessFees(inputTradeAmount: u64, params: QuotePoolParams): u64 {
   return inputTradeAmount.sub(getLPFees(inputTradeAmount, params));
@@ -142,4 +143,22 @@ export class StablePoolQuoteBuilder {
         OrcaU64.fromU64(getMinimumAmountOut(inputTradeAmount, params), params.outputToken.scale),
     };
   }
+}
+
+export function calculateFees(inputTradeAmount: u64, feeStructure: FeeStructure): u64 {
+  const tradingFee =
+    feeStructure.traderFee.numerator === ZERO
+      ? ZERO
+      : inputTradeAmount
+          .mul(feeStructure.traderFee.numerator)
+          .div(feeStructure.traderFee.denominator);
+
+  const ownerFee =
+    feeStructure.ownerFee.numerator === ZERO
+      ? ZERO
+      : inputTradeAmount
+          .mul(feeStructure.ownerFee.numerator)
+          .div(feeStructure.ownerFee.denominator);
+
+  return new u64(tradingFee.add(ownerFee).toString());
 }
